@@ -1,14 +1,9 @@
 package core
 
-import "io"
+import "github.com/Mostbesep/Modularis/crypto"
 
 type Transaction struct {
-	Data []byte
-}
-
-func (tx *Transaction) EncodeBinary(reader io.Writer) error {
-	return nil
-}
-func (tx *Transaction) DecodeBinary(reader io.Reader) error {
-	return nil
+	Data      []byte
+	publicKey crypto.PublicKey
+	signature *crypto.Signature
 }
