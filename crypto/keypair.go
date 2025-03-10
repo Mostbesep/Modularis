@@ -58,10 +58,14 @@ type Signature struct {
 	r, s *big.Int
 }
 
-func (s *Signature) Verify(pubKey PublicKey, data []byte) bool {
-	return ecdsa.Verify(pubKey.Key, data, s.r, s.s)
+func (s Signature) Verify(pubKey PublicKey, data []byte) bool {
+	return ecdsa.Verify(
+		pubKey.Key,
+		data,
+		s.r,
+		s.s)
 }
 
-func (s *Signature) String() string {
+func (s Signature) String() string {
 	return fmt.Sprintf("{Signature: s: %d, r: %d}", s.s, s.r)
 }

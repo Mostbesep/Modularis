@@ -23,28 +23,24 @@ func TestTransaction_Verify(t *testing.T) {
 	tx := &Transaction{
 		Data: data,
 	}
-	verify, err := tx.Verify()
+	err := tx.Verify()
 	assert.ErrorIs(t, err, TransactionNotSignedErr)
-	assert.False(t, verify)
 
 	prvKey := crypto.GeneratePrivateKey()
 	err = tx.Sign(prvKey)
 	assert.NoError(t, err)
-	verify, err = tx.Verify()
+	err = tx.Verify()
 	assert.NoError(t, err)
-	assert.True(t, verify)
 
 	otherPrvKey := crypto.GeneratePrivateKey()
 	tx.publicKey = otherPrvKey.PublicKey()
-	verify, err = tx.Verify()
-	assert.ErrorIs(t, err, InvalidSignatureErr)
-	assert.False(t, verify)
+	err = tx.Verify()
+	assert.ErrorIs(t, err, InvalidTransactionSignatureErr)
 
 	tx.Data = []byte("foo")
 	tx.Sign(prvKey)
 	tx.Data = []byte("bar")
-	verify, err = tx.Verify()
-	assert.ErrorIs(t, err, InvalidSignatureErr)
-	assert.False(t, verify)
+	err = tx.Verify()
+	assert.ErrorIs(t, err, InvalidTransactionSignatureErr)
 
 }

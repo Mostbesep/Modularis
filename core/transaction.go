@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	TransactionNotSignedErr = errors.New("transaction not signed")
-	InvalidSignatureErr     = errors.New("transaction signature or data is invalid")
+	TransactionNotSignedErr        = errors.New("transaction not signed")
+	InvalidTransactionSignatureErr = errors.New("transaction signature or data is invalid")
 )
 
 type Transaction struct {
@@ -26,13 +26,13 @@ func (tx *Transaction) Sign(privateKey crypto.PrivateKey) error {
 	return nil
 }
 
-func (tx *Transaction) Verify() (bool, error) {
+func (tx *Transaction) Verify() error {
 	if tx.signature == nil {
-		return false, TransactionNotSignedErr
+		return TransactionNotSignedErr
 	}
 	result := tx.signature.Verify(tx.publicKey, tx.Data)
 	if !result {
-		return false, InvalidSignatureErr
+		return InvalidTransactionSignatureErr
 	}
-	return result, nil
+	return nil
 }
