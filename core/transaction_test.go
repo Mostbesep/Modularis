@@ -15,7 +15,7 @@ func TestTransaction_Sign(t *testing.T) {
 	err := tx.Sign(prvKey)
 	assert.NoError(t, err)
 	assert.NotNil(t, tx.signature)
-	assert.NotNil(t, tx.publicKey)
+	assert.NotNil(t, tx.From)
 }
 
 func TestTransaction_Verify(t *testing.T) {
@@ -33,7 +33,7 @@ func TestTransaction_Verify(t *testing.T) {
 	assert.NoError(t, err)
 
 	otherPrvKey := crypto.GeneratePrivateKey()
-	tx.publicKey = otherPrvKey.PublicKey()
+	tx.From = otherPrvKey.PublicKey()
 	err = tx.Verify()
 	assert.ErrorIs(t, err, InvalidTransactionSignatureErr)
 

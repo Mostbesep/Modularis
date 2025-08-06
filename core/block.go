@@ -23,6 +23,15 @@ type Header struct {
 	Timestamp     int64
 }
 
+func (h Header) Bytes() []byte {
+	var buf bytes.Buffer
+	err := gob.NewEncoder(&buf).Encode(h)
+	if err != nil {
+		panic(err) // should never happen
+	}
+	return buf.Bytes()
+}
+
 func (h Header) String() string {
 	return fmt.Sprintf("Header:{version:%d ,Height: %d, time: %d, DataHash: %+v, PrevBlockHash: %+v}",
 		h.Version, h.Height, h.Timestamp, h.DataHash, h.PrevBlockHash)
@@ -39,7 +48,7 @@ type Block struct {
 }
 
 func (b *Block) Sign(prvKey crypto.PrivateKey) error {
-	sign, err := prvKey.Sign(b.HeaderData())
+	sign, err := prvKey.Sign(b.Header.Bytes())
 	if err != nil {
 		return err
 	}
@@ -53,8 +62,7 @@ func (b *Block) Verify() error {
 	if b.Signature == nil {
 		return BlockNotSignedErr
 	}
-	verify := b.Signature.Verify(b.Validator, b.HeaderData())
-	if !verify {
+	if !b.Signature.Verify(b.Validator, b.Header.Bytes()) {
 		return InvalidBlockSignatureErr
 	}
 	return nil
@@ -71,20 +79,9 @@ func (b *Block) Decode(r io.Reader, dec Decoder[*Block]) error {
 func (b *Block) Encode(w io.Writer, enc Encoder[*Block]) error {
 	return enc.Encode(w, b)
 }
-func (b *Block) Hash(hasher Hasher[*Block]) types.Hash {
+func (b *Block) Hash(hasher Hasher[*Header]) types.Hash {
 	if b.hash.IsZero() {
-		b.hash = hasher.Hash(b)
+		b.hash = hasher.Hash(b.Header)
 	}
 	return b.hash
-}
-
-func (b *Block) HeaderData() []byte {
-	buf := &bytes.Buffer{}
-	enc := gob.NewEncoder(buf)
-	err := enc.Encode(b.Header)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	return buf.Bytes()
 }

@@ -12,7 +12,7 @@ var (
 
 type Transaction struct {
 	Data      []byte
-	publicKey crypto.PublicKey
+	From      crypto.PublicKey
 	signature *crypto.Signature
 }
 
@@ -21,7 +21,7 @@ func (tx *Transaction) Sign(privateKey crypto.PrivateKey) error {
 	if err != nil {
 		return err
 	}
-	tx.publicKey = privateKey.PublicKey()
+	tx.From = privateKey.PublicKey()
 	tx.signature = sig
 	return nil
 }
@@ -30,7 +30,7 @@ func (tx *Transaction) Verify() error {
 	if tx.signature == nil {
 		return TransactionNotSignedErr
 	}
-	result := tx.signature.Verify(tx.publicKey, tx.Data)
+	result := tx.signature.Verify(tx.From, tx.Data)
 	if !result {
 		return InvalidTransactionSignatureErr
 	}

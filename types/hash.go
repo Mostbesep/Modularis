@@ -20,6 +20,10 @@ func (h Hash) IsZero() bool {
 	return h == Hash{}
 }
 
+func (h Hash) Equal(hash Hash) bool {
+	return h == hash
+}
+
 func HashFromBytes(b []byte) Hash {
 	if len(b) != 32 {
 		msg := fmt.Sprintf("given bytes with length %d should be 32", len(b))
